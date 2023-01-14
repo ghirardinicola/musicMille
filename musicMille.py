@@ -4,7 +4,7 @@ from gpt import build_playlist,build_gpt_prompt
 
 logging.basicConfig(level=logging.INFO)
 
-playlist_desc = input('Give me a playlist ')
+playlist_desc = input('Create a Spotify playlist ')
 
 prompt=build_gpt_prompt(playlist_desc)
 
