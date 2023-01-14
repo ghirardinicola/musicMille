@@ -1,1 +1,6 @@
-secret.yaml
+config.yaml
+.env
+.cache
+.vscode
+__pycache__/
+.log
