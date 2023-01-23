@@ -3,6 +3,8 @@ import logging
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
+logger=logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 
@@ -28,20 +30,20 @@ def renew_playlist(playlist_obj):
         for playlist_res in playlist_results['playlists']['items']:
             if playlist_res['name'] == playlist_name:
                 playlist = playlist_res
-                logging.debug("Playlist found, removing tracks")
+                logger.debug("Playlist found, removing tracks")
 
                 tracks = sp.playlist_tracks(playlist_res['id'])
                 track_uris = [track["track"]["uri"] for track in tracks["items"]]
                 sp.user_playlist_remove_all_occurrences_of_tracks(username, playlist_res['id'], track_uris)
-                logging.debug(f'All {len(track_uris)} tracks removed from the playlist')
+                logger.debug(f'All {len(track_uris)} tracks removed from the playlist')
                 
 
     if playlist==None:
-        logging.debug("Playlist not found, creating")
+        logger.debug("Playlist not found, creating")
         playlist = sp.user_playlist_create(username, playlist_name)
 
     playlist_id = playlist['id']
-    logging.debug(f"playlist_id: {playlist_id}")
+    logger.debug(f"playlist_id: {playlist_id}")
 
 
     for item in playlist_obj:
@@ -52,14 +54,13 @@ def renew_playlist(playlist_obj):
         if results['tracks']['total'] > 0:
             track_uri = results['tracks']['items'][0]['uri']
             sp.user_playlist_add_tracks(username, playlist_id, [track_uri])
-            logging.info(f"Track {title} by {artist} added to the playlist")
+            logger.debug(f"Track {title} by {artist} added to the playlist")
         else:
-            print(f"Track {title} by {artist} not found")
+            logger.warn(f"Track {title} by {artist} not found")
 
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
     
     prompt='Give me a list of python dict having song and artist keys describing "playlist rock adatta al sabato mattina come la farebbe scaruffi"'
 

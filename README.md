@@ -14,3 +14,10 @@ Create a config.yaml file such as (first entries of spotify):
 - python musicMille.py
 - Listen musicMille_0 playlist
 - Contribuite ;)
+
+## Next
+Make it step-by-step:
+- Split follow-up questions, they are not that useful now
+- Describe using chat
+- Decide it's fine, write to Spotify
+- Get a spotify playlist and start from there (NICE! Start from there, more this, less that)
