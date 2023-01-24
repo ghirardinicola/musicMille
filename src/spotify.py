@@ -45,6 +45,7 @@ def renew_playlist(playlist_obj):
     playlist_id = playlist['id']
     logger.debug(f"playlist_id: {playlist_id}")
 
+    print(playlist_obj)
 
     for item in playlist_obj:
         title = item['song']
