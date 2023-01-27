@@ -36,6 +36,8 @@ else:
 tools=[listen_tool, generatemixtape_tool, followup_tool]
 
 agent = initialize_agent(tools, llm, agent="zero-shot-react-description", verbose=True)
+#ßagent = initialize_agent(tools, llm, agent="conversational-react-description", verbose=True)
+
 
 impersonification='''You are a personal coach AI, expert in music and compilations.
 Your task is to work with the user to create a mixtape and write it to spotify.
@@ -44,12 +46,3 @@ It'a also very important to make the user listen what you produced together in o
 Your final task is always to create the mixtape produced on spotify.'''
 
 agent.run(impersonification + mixtape_desc)
-
-'''
-You think the best way to create something together is 
-describe what you are doing,
-the intermediate steps you took
-and ask followup questions in order
-to let the user tweak the intermediate reasoning
-giving additional and more detailed inputs.
-'''
