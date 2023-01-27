@@ -1,12 +1,17 @@
 import openai
 import os
 import yaml
-from gpt import build_templates, json_convert_template
-from langchain.agents import initialize_agent, Tool
+from gpt import build_templates
+from langchain.agents import Tool
 from langchain.llms import OpenAI
-from spotify import renew_playlist
+from spotify import renew_mixtape
 from langchain.chains import LLMChain
+import logging
 
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 with open('config.yaml', 'r') as file:
     config = yaml.safe_load(file)
@@ -14,29 +19,34 @@ with open('config.yaml', 'r') as file:
 openai.api_key = config["open_api_api_key"]
 os.environ["OPENAI_API_KEY"]=config["open_api_api_key"]
 
-llm = OpenAI(temperature=0.7,max_tokens=512)
+llm = OpenAI(temperature=0.3,max_tokens=512)
 
-#json_converter= LLMChain(llm=llm, prompt=json_convert_template())
-
-def json_converter(string):
+def string2List(string):
     songs=[]
-    lines = string.split("\n")
+    lines = string.split(";")
+    logger.debug(len(lines))
     for line in lines:
-        values = line.split(",")
-        songs+={"song": values[0], "artist":values[1]}
+        if line!="":
+            values = line.split(",")
+            songs.append({
+                "song": values[0].replace('"',""),
+             "artist":values[1]
+             })
     return songs
 
+def writemixtapeInSpotify(mixtapeListStr):
+    logger.debug("input:" + mixtapeListStr)
+    mixtapeList=string2List(mixtapeListStr)
+    renew_mixtape(mixtapeList)
+    return "The music_mille0 mixtape is on your spotify account!"
 
-convert2json_tool =  Tool(
-    name = "convert2json",
-    func=json_converter,
-    description='''useful for when you have to listen a playlist / mixtape or convert it to json
-    If the playlist is 
-    1 - song,artist 
-    2- song2,artist2 
-    the input should be 
-    song,artist 
-    song2,artist2 
+
+listen_tool =  Tool(
+    name = "writemixtapeInSpotify",
+    func=writemixtapeInSpotify,
+    description='''useful to write a mixtape on Spotify in order to make the user listen to it.
+    The input to this tool should be something like:
+    "The Scientist", "Coldplay"; "Don't Stop Me Now", "Queen"
     ''',
     return_direct=True
 )
@@ -46,38 +56,48 @@ main_prompt_template,follow_up_template=build_templates()
 main_request_template = LLMChain(llm=llm, prompt=main_prompt_template)
 questions_template = LLMChain(llm=llm, prompt=follow_up_template)
 
-generatePlaylist_tool = Tool (
+generatemixtape_tool = Tool (
     name = "generateMixtape",
     func=main_request_template.run,
     description='''
-    useful for when you have to make, generate a playlist or mixtape. 
+    useful for when you have to create a mixtape or mixtape. 
     The output is the mixtape
-    If the prompt is "a mixtape for me"
-    the input should be "for me"
+    If the prompt is "Let's thinsk about a mixtape for me. bla bla. ble blu."
+    the input should be "Make a mixtape for me. bla bla. ble blu."
     ''',
 )
 
 followup_tool = Tool (
     name = "generateFollowup",
     func=questions_template.run,
-    description="useful for when you have to generate followup questions in order to better understand the user input, asking details",
+    description='''useful for when you have to generate followup questions in order to better understand the user input, asking details.
+    If the prompt is "Let's thinsk about a mixtape for me. bla bla. ble blu."
+    the input should be "Make a mixtape for me. bla bla. ble blu."
+    The output are the followup questions
+    ''',
 )
 
 
 
 
 if __name__ == "__main__":
-    with open('config.yaml', 'r') as file:
-        config = yaml.safe_load(file)
+    # with open('config.yaml', 'r') as file:
+    #     config = yaml.safe_load(file)
 
-    openai.api_key = config["open_api_api_key"]
-    os.environ["OPENAI_API_KEY"]=config["open_api_api_key"]
+    # openai.api_key = config["open_api_api_key"]
+    # os.environ["OPENAI_API_KEY"]=config["open_api_api_key"]
 
-    llm = OpenAI(temperature=0)
-    prompt="Ok, let's listen it!"
-    mixtape="Mixtape: 1: a, 2: b."
-    # Construct the agent. We will use the default agent type here.
-    agent = initialize_agent([convert2json_tool], llm, agent="zero-shot-react-description", verbose=True)
+    # llm = OpenAI(temperature=0)
+    # prompt="Ok, let's listen it!"
+    # mixtape="Mixtape: 1: a, 2: b."
+    # # Construct the agent. We will use the default agent type here.
+    # agent = initialize_agent([convert2json_tool], llm, agent="zero-shot-react-description", verbose=True)
 
-    agent.run(mixtape + prompt)
-
+    # agent.run(mixtape + prompt)
+    sl=string2List('''"Code Monkey", "Jonathan Coulton"
+    "The Scientist", "Coldplay"
+    "I'm Shipping Up To Boston", "Dropkick Murphys"
+    "Eye of the Tiger", "Survivor"
+    "Immigrant Song", "Led Zeppelin"''')
+    print("mixtapeList: {}".format(' '.join(map(str, sl))))
+    renew_mixtape(sl)

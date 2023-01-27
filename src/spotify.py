@@ -4,7 +4,7 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 logger=logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 
 
@@ -17,45 +17,47 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=config['client_id'],
                                                redirect_uri='http://localhost:8000/callback',
                                                scope=["playlist-modify-public"]))
 
-def renew_playlist(playlist_obj):
+def renew_mixtape(mixtape_obj):
+
+    logger.debug(mixtape_obj)
    
     username = config['username']
-    playlist_name = 'musicMille_0'
+    mixtape_name = 'musicMille_0'
 
-    playlist_results = sp.search(q=playlist_name, type='playlist')
+    mixtape_results = sp.search(q=mixtape_name, type='playlist')
 
-    playlist=None
+    mixtape=None
 
-    if playlist_results['playlists']['total'] > 0:
-        for playlist_res in playlist_results['playlists']['items']:
-            if playlist_res['name'] == playlist_name:
-                playlist = playlist_res
-                logger.debug("Playlist found, removing tracks")
+    if mixtape_results['playlists']['total'] > 0:
+        for mixtape_res in mixtape_results['playlists']['items']:
+            if mixtape_res['name'] == mixtape_name:
+                mixtape = mixtape_res
+                logger.debug("playlist found, removing tracks")
 
-                tracks = sp.playlist_tracks(playlist_res['id'])
+                tracks = sp.playlist_tracks(mixtape_res['id'])
                 track_uris = [track["track"]["uri"] for track in tracks["items"]]
-                sp.user_playlist_remove_all_occurrences_of_tracks(username, playlist_res['id'], track_uris)
-                logger.debug(f'All {len(track_uris)} tracks removed from the playlist')
+                sp.user_playlist_remove_all_occurrences_of_tracks(username, mixtape_res['id'], track_uris)
+                logger.debug(f'All {len(track_uris)} tracks removed from the mixtape')
                 
 
-    if playlist==None:
-        logger.debug("Playlist not found, creating")
-        playlist = sp.user_playlist_create(username, playlist_name)
+    if mixtape==None:
+        logger.debug("mixtape not found, creating")
+        mixtape = sp.user_playlist_create(username, mixtape_name)
 
-    playlist_id = playlist['id']
-    logger.debug(f"playlist_id: {playlist_id}")
+    mixtape_id = mixtape['id']
+    logger.debug(f"mixtape_id: {mixtape_id}")
 
-    print(playlist_obj)
 
-    for item in playlist_obj:
+
+    for item in mixtape_obj:
         title = item['song']
         artist = item['artist']
         results = sp.search(q='track:' + title + ' artist:' + artist, type='track')
 
         if results['tracks']['total'] > 0:
             track_uri = results['tracks']['items'][0]['uri']
-            sp.user_playlist_add_tracks(username, playlist_id, [track_uri])
-            logger.debug(f"Track {title} by {artist} added to the playlist")
+            sp.user_playlist_add_tracks(username, mixtape_id, [track_uri])
+            logger.debug(f"Track {title} by {artist} added to the mixtape")
         else:
             logger.warn(f"Track {title} by {artist} not found")
 
@@ -63,9 +65,9 @@ def renew_playlist(playlist_obj):
 
 if __name__ == "__main__":
     
-    prompt='Give me a list of python dict having song and artist keys describing "playlist rock adatta al sabato mattina come la farebbe scaruffi"'
+    prompt='Give me a list of python dict having song and artist keys describing "mixtape rock adatta al sabato mattina come la farebbe scaruffi"'
 
-    playlist_obj = [
+    mixtape_obj = [
         {'song': 'Good Morning Little School Girl', 'artist': 'The Yardbirds'},
         {'song': 'Saturday Morning', 'artist': 'The Kinks'},
         {'song': 'Breakfast in Bed', 'artist': 'Dusty Springfield'},
@@ -78,4 +80,4 @@ if __name__ == "__main__":
         {'song': 'Saturday Night', 'artist': 'The Bay City Rollers'},
     ]
 
-    renew_playlist(playlist_obj)
+    renew_mixtape(mixtape_obj)

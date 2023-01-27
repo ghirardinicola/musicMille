@@ -1,6 +1,6 @@
 # musicMille
 
-Linux terminal command to create a musicMille spotify playlist, just as talking with (chat)GPT
+Linux terminal command to create a musicMille spotify mixtape, just as talking with (chat)GPT
 
 ## Usage
 Create a config.yaml file such as (first entries of spotify):   
@@ -12,11 +12,11 @@ Create a config.yaml file such as (first entries of spotify):
 
 - Create python env using requirement.txt
 - python musicMille.py
-- Listen musicMille_0 playlist
+- Listen musicMille_0 mixtape
 - Contribuite ;)
 
 ## Next
 Make it step-by-step:
 - Split follow-up questions, they are not that useful now
 - Decide it's fine, write to Spotify
-- Get a spotify playlist and start from there (NICE! Start from there, more this, less that)
+- Get a spotify mixtape and start from there (NICE! Start from there, more this, less that)

@@ -10,39 +10,8 @@ from langchain.chains import LLMChain
 logger= logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-
-def json_convert_template():
-        convert_json = PromptTemplate(
-                input_variables=["input"],
-                template='''Convert the following input to a valid json. 
-                Something like:
-                [
-                        {
-                                "song": "Roundabout",
-                                "artist": "Yes"
-                        },
-                         {
-                                "song": "Song title",
-                                "artist": "Artist name"
-                        },
-                         {
-                                "song": "Third song",
-                                "artist": "Third artist name"
-                        }
-                ]
-                input:  {{input}}
-                 ''',
-                template_format='jinja2',
-        )
-        return convert_json
-
-
 def build_templates():
-
-        impersonification=''' You are a music expert AI that can produce valid json describing mixtape.
-        '''
-
-        instruction_main='''mixtape_request:  Make a mixtape of 5 songs 
+        instruction_main='''mixtape_request:  Make a mixtape of 10 songs 
         '''
                 
         instruction_2=        '''Do not used the same artist more then once.
@@ -50,8 +19,6 @@ def build_templates():
 
         instruction_5=''' Add an explanation on why did you choose these songs and how this is a good mixtape 
         '''
-
-        instruction_6 = ''' Be sure to return only a valid json. '''
 
         example_mixtape_request= ''' Make a mixtape of 4 songs to listen in a train travel while snowing. It's for Nicola. He's italian and he's 40. Start with Time after time, sang by Eva Cassidy '''
  
@@ -88,7 +55,7 @@ def build_templates():
 
         main_prompt = FewShotPromptTemplate(
                 input_variables=["user_input"],
-                prefix=impersonification + instruction_2 + instruction_5,
+                prefix= instruction_2 + instruction_5,
                 suffix= instruction_main + " {user_input} ",
                 example_prompt=example_prompt,
                 examples=examples

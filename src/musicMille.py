@@ -1,16 +1,13 @@
 import logging
-from spotify import renew_playlist
+from spotify import renew_mixtape
 
 import sys
 import openai
 import os
-from tools import convert2json_tool, generatePlaylist_tool, followup_tool
+from tools import listen_tool, generatemixtape_tool, followup_tool
 import openai
-from langchain.llms import OpenAI
-from langchain.agents import ConversationalAgent, ZeroShotAgent, AgentExecutor, initialize_agent
-from langchain.chains import LLMChain
+from langchain.agents import initialize_agent
 from tools import llm
-import json
 import yaml
 
 logging.basicConfig()
@@ -25,32 +22,34 @@ os.environ["OPENAI_API_KEY"]=config["open_api_api_key"]
 
 
 n = len(sys.argv)
-playlist_desc=""
+mixtape_desc=""
 if n>1:
     for i in range(1, n):
-        playlist_desc+=sys.argv[i] + " "
+        mixtape_desc+=sys.argv[i] + " "
 else:
-    playlist_desc = input('Create a mixtape ')
+    mixtape_desc = input('''I am here to help you to create a mixtape.
+    Ask me!
+    ''')
 
 
 # Construct the agent. We will use the default agent type here.
-tools=[convert2json_tool, generatePlaylist_tool, followup_tool]
+tools=[listen_tool, generatemixtape_tool, followup_tool]
 
-
-#
 agent = initialize_agent(tools, llm, agent="zero-shot-react-description", verbose=True)
-playlist_json_string=agent.run('Create a mixtape ' +  playlist_desc + '''.
-Ask the user followup question in order to get additional details about the mixtape parameters. 
-Then convert to a valid json array representing the songs. 
-Use MUST use ONLY the valid json as final response''')
 
-logger.debug(playlist_json_string)
-playlist_obj= json.loads(playlist_json_string)
+impersonification='''You are a personal coach AI, expert in music and compilations.
+Your task is to work with the user to create a mixtape and write it to spotify.
+You think the best way to create a mixtape together is to create it having as input the original request and ask followup questions in order to stimulate the user to tweak the intermediate reasoning giving additional and more detailed inputs.
+It'a also very important to make the user listen what you produced together in order to tweak it iteratively (more of this, less of that, don't use that).
+Your final task is always to create the mixtape produced on spotify.'''
 
+agent.run(impersonification + mixtape_desc)
 
-for song in playlist_obj:
-    print(song) 
-
-renew_playlist(playlist_obj)
-
-logger.info("The music_mille0 playlist is on your spotify account!")
+'''
+You think the best way to create something together is 
+describe what you are doing,
+the intermediate steps you took
+and ask followup questions in order
+to let the user tweak the intermediate reasoning
+giving additional and more detailed inputs.
+'''
