@@ -47,8 +47,7 @@ listen_tool =  Tool(
     description='''useful to write a mixtape on Spotify in order to make the user listen to it.
     The input to this tool should be something like:
     "The Scientist", "Coldplay"; "Don't Stop Me Now", "Queen"
-    ''',
-    return_direct=True
+    '''
 )
 
 main_prompt_template,follow_up_template=build_templates()
@@ -62,8 +61,7 @@ generatemixtape_tool = Tool (
     description='''
     useful for when you have to create a mixtape or mixtape. 
     The output is the mixtape
-    If the prompt is "Let's thinsk about a mixtape for me. bla bla. ble blu."
-    the input should be "Make a mixtape for me. bla bla. ble blu."
+    The input should be all the user chat history and the previous generated mixtape 
     ''',
 )
 

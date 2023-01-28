@@ -1,14 +1,16 @@
 import logging
-from spotify import renew_mixtape
 
 import sys
 import openai
 import os
 from tools import listen_tool, generatemixtape_tool, followup_tool
 import openai
-from langchain.agents import initialize_agent
+from langchain.agents import ConversationalAgent, Tool, AgentExecutor
 from tools import llm
 import yaml
+from langchain import OpenAI, LLMChain
+from langchain.chains.conversation.memory import ConversationBufferMemory
+
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -22,27 +24,49 @@ os.environ["OPENAI_API_KEY"]=config["open_api_api_key"]
 
 
 n = len(sys.argv)
-mixtape_desc=""
+userInput=""
 if n>1:
     for i in range(1, n):
-        mixtape_desc+=sys.argv[i] + " "
+        userInput+=sys.argv[i] + " "
 else:
-    mixtape_desc = input('''I am here to help you to create a mixtape.
-    Ask me!
-    ''')
+    userInput = "Make a mixtape " + input('''Make a mixtape ''')
 
 
 # Construct the agent. We will use the default agent type here.
 tools=[listen_tool, generatemixtape_tool, followup_tool]
 
-agent = initialize_agent(tools, llm, agent="zero-shot-react-description", verbose=True)
-#ßagent = initialize_agent(tools, llm, agent="conversational-react-description", verbose=True)
+memory = ConversationBufferMemory(memory_key="chat_history")
+llm=OpenAI(temperature=0.7)
 
+impersonification='''
+Your task is to work with the Human to create a mixtape and write it to spotify. 
+Then always ask followup questions to the Human in order to get a more detailed description of the mixtape you have to create. 
+Create a new version of the mixtape after the Human response and write to spotify.
+Always use the tool to write the mixtape to spotify.
+Remember the Human that can ask for modification of the playlist and ask followup questions.
+'''
 
-impersonification='''You are a personal coach AI, expert in music and compilations.
-Your task is to work with the user to create a mixtape and write it to spotify.
-You think the best way to create a mixtape together is to create it having as input the original request and ask followup questions in order to stimulate the user to tweak the intermediate reasoning giving additional and more detailed inputs.
-It'a also very important to make the user listen what you produced together in order to tweak it iteratively (more of this, less of that, don't use that).
-Your final task is always to create the mixtape produced on spotify.'''
+tools_prompt=""" You have access to the following tools:"""
+suffix = """Make a mixtape... "
 
-agent.run(impersonification + mixtape_desc)
+{chat_history}
+Question: {input}
+{agent_scratchpad}"""
+
+prompt = ConversationalAgent.create_prompt(
+    tools, 
+    prefix=impersonification+tools_prompt, 
+    suffix=suffix, 
+    input_variables=["input", "chat_history", "agent_scratchpad"]
+)
+
+llm_chain = LLMChain(llm=OpenAI(temperature=0), prompt=prompt,verbose=True)
+agent = ConversationalAgent(llm_chain=llm_chain, tools=tools, verbose=True, return_intermediate_steps=True)
+agent_chain = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=True, memory=memory)
+
+while True:
+    if userInput=="exit":
+        exit()
+    else:   
+        response=agent_chain.run(input=userInput)
+        userInput=input("")
