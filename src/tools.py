@@ -1,10 +1,9 @@
-import openai
 import os
 import yaml
 from gpt import build_templates
 from langchain.agents import Tool
-from langchain.llms import OpenAI
 from spotify import renew_mixtape
+from langchain_openai import OpenAI
 from langchain.chains import LLMChain
 import logging
 
@@ -16,7 +15,6 @@ logger.setLevel(logging.DEBUG)
 with open('config.yaml', 'r') as file:
     config = yaml.safe_load(file)
 
-openai.api_key = config["open_api_api_key"]
 os.environ["OPENAI_API_KEY"]=config["open_api_api_key"]
 
 llm = OpenAI(temperature=0.3,max_tokens=512)
@@ -59,9 +57,9 @@ generatemixtape_tool = Tool (
     name = "generateMixtape",
     func=main_request_template.run,
     description='''
-    useful for when you have to create a mixtape or mixtape. 
+    useful for when you have to create a mixtape. 
     The output is the mixtape
-    The input should be all the user chat history and the previous generated mixtape 
+    The input should be all the user request and the previous generated mixtape, if there is one.
     ''',
 )
 

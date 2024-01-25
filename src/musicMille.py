@@ -1,16 +1,14 @@
 import logging
 
 import sys
-import openai
 import os
 from tools import listen_tool, generatemixtape_tool, followup_tool
-import openai
-from langchain.agents import ConversationalAgent, Tool, AgentExecutor
-from tools import llm
+from langchain.agents import ConversationalAgent, initialize_agent, AgentExecutor, load_tools
 import yaml
-from langchain import OpenAI, LLMChain
+from langchain.chains import LLMChain
+from langchain_openai import OpenAI
 from langchain.chains.conversation.memory import ConversationBufferMemory
-
+from langchain.agents import create_openai_functions_agent
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -18,10 +16,6 @@ logger.setLevel(logging.DEBUG)
 
 with open('config.yaml', 'r') as file:
     config = yaml.safe_load(file)
-
-openai.api_key = config["open_api_api_key"]
-os.environ["OPENAI_API_KEY"]=config["open_api_api_key"]
-
 
 n = len(sys.argv)
 userInput=""
@@ -31,18 +25,18 @@ if n>1:
 else:
     userInput = "Make a mixtape " + input('''Make a mixtape ''')
 
-
 # Construct the agent. We will use the default agent type here.
-tools=[listen_tool, generatemixtape_tool, followup_tool]
+tools_names=[listen_tool, generatemixtape_tool, followup_tool]
 
 memory = ConversationBufferMemory(memory_key="chat_history")
+# , model=config["model"]
 llm=OpenAI(temperature=0.7)
 
 impersonification='''
 Your task is to work with the Human to create a mixtape and write it to spotify. 
-Then always ask followup questions to the Human in order to get a more detailed description of the mixtape you have to create. 
-Create a new version of the mixtape after the Human response and write to spotify.
-Always use the tool to write the mixtape to spotify.
+Ask followup questions to the Human in order to get a more detailed description of the mixtape you have to create. 
+Create a new version of the mixtape after the Human responses.
+Use the tool to write the mixtape to spotify, after the user confirm it.
 Remember the Human that can ask for modification of the playlist and ask followup questions.
 '''
 
@@ -53,20 +47,23 @@ suffix = """Make a mixtape... "
 Question: {input}
 {agent_scratchpad}"""
 
+
 prompt = ConversationalAgent.create_prompt(
-    tools, 
+    tools_names,
     prefix=impersonification+tools_prompt, 
     suffix=suffix, 
     input_variables=["input", "chat_history", "agent_scratchpad"]
 )
 
-llm_chain = LLMChain(llm=OpenAI(temperature=0), prompt=prompt,verbose=True)
-agent = ConversationalAgent(llm_chain=llm_chain, tools=tools, verbose=True, return_intermediate_steps=True)
-agent_chain = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=True, memory=memory)
+llm_chain = LLMChain(llm=llm, prompt=prompt, verbose=True)
+agent = ConversationalAgent(llm_chain=llm_chain, verbose=True, return_intermediate_steps=True)
+agent_executor = AgentExecutor(agent=agent, tools=tools_names, verbose=True, memory=memory)
 
 while True:
     if userInput=="exit":
         exit()
-    else:   
-        response=agent_chain.run(input=userInput)
+    else:
+        logger.info("invoke the agent")
+        response=agent_executor.invoke({"input": userInput})
         userInput=input("")
+
