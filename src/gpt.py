@@ -1,10 +1,9 @@
 
-import openai
 import os
 import yaml
 import logging
 from langchain.prompts import PromptTemplate, FewShotPromptTemplate
-from langchain.llms import OpenAI
+from langchain_openai import ChatOpenAI
 from langchain.chains import LLMChain
 
 logger= logging.getLogger(__name__)
@@ -80,10 +79,7 @@ if __name__ == "__main__":
         with open('config.yaml', 'r') as file:
                 config = yaml.safe_load(file)
 
-        openai.api_key = config["open_api_api_key"]
-        os.environ["OPENAI_API_KEY"]=config["open_api_api_key"]
-
-        llm = OpenAI(temperature=0.7,max_tokens=512)
+        llm = ChatOpenAI(openai_api_key=config["open_api_api_key"],temperature=0.7)
         
         user_prompt='rock adatta al sabato mattina come la farebbe scaruffi'
         main_prompt,follow_up=build_templates()

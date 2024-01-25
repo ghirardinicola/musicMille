@@ -1,6 +1,8 @@
 config.yaml
 .env
+.venv
 .cache
 .vscode
 __pycache__/
 .log
+.idea
