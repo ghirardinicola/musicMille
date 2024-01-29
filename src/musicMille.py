@@ -138,8 +138,16 @@ memory = ConversationBufferWindowMemory(
     output_key="output"
 )
 
-agent_obj = ConversationalAgent.from_llm_and_tools(
-    llm, tools, callback_manager=None, prompt=myTmplate
+from langchain import LLMChain
+llm_chain = LLMChain(llm=llm, prompt=myTmplate)
+
+from langchain.agents import Tool, AgentExecutor, LLMSingleActionAgent, AgentOutputParser
+tool_names = [tool.name for tool in tools]
+agent = LLMSingleActionAgent(
+    llm_chain=llm_chain,
+    output_parser=output_parser,
+    stop=["\nObservation:"],
+    allowed_tools=tool_names
 )
 agent_executor = AgentExecutor.from_agent_and_tools(
     agent=agent_obj,
@@ -147,7 +155,8 @@ agent_executor = AgentExecutor.from_agent_and_tools(
     callback_manager=None,
     verbose=True,
     memory=memory,
-    return_intermediate_steps=True
+    #return_intermediate_steps=True,
+    #handle_parsing_errors=True
 )
 # agent = create_json_chat_agent(llm=llm, tools=tools, prompt=myTmplate)
 #
