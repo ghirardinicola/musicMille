@@ -75,13 +75,13 @@ agent = create_structured_chat_agent(llm=llm, tools=tools, prompt=prompt)
 # agent = ConversationalAgent(llm_chain=llm_chain, verbose=True, return_intermediate_steps=True)
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, max_iterations=5)  # memory=memory
 
-while True:
-    if userInput == "exit":
-        exit()
-    else:
-        logger.info("invoke the agent")
-        response = agent_executor.invoke({"input": userInput} , "chat_history": [
-            HumanMessage(content="hi! my name is bob"),
-            AIMessage(content="Hello Bob! How can I assist you today?"),
-        ],)
-        userInput = input("")
+# while True:
+#     if userInput == "exit":
+#         exit()
+#     else:
+#         logger.info("invoke the agent")
+#         response = agent_executor.invoke({"input": userInput} , "chat_history": [
+#             HumanMessage(content="hi! my name is bob"),
+#             AIMessage(content="Hello Bob! How can I assist you today?"),
+#         ],)
+#         userInput = input("")
