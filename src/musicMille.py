@@ -32,12 +32,14 @@ logger.info(userInput)
 tools = [listen_tool, generatemixtape_tool, followup_tool]
 
 # , model=config["model"]
-llm = ChatOpenAI(temperature=0)  # , model="gpt-4")
+llm = ChatOpenAI(temperature=0, model="gpt-4")
 
 impersonification = '''
 Your task is to chat with the User in order to get mixtape details, create a mixtape and write it to spotify. 
 Create a refined version of the mixtape after every user input and show the user the result. 
-Laways ask some followup questions in order to get a more detailed description of the mixtape you have to create. Do it even if you already generated a mixtape.
+Always ask some at least one creative followup question in order to get a more detailed description of the mixtape you have to create. Do it even if you already generated a mixtape.
+Important input to consider when doing a mixtape are whom the mixtape is for, the ralation with him/her, the message to carry,
+ a reference artist, the occasion the mixtape is for, etc. 
 Write the mixtape to spotify only if the user confirms it. 
 '''
 # Explain the user why
@@ -99,7 +101,7 @@ Use this if you want to use a tool.
 }}
 ```
 **Option #2:**
-Use this if you want to respond directly to the human. Markdown code snippet formatted in the following schema:
+Use this if you want to respond directly to the user. Markdown code snippet formatted in the following schema:
 ```json
 {{
     "action": "Final Answer",
@@ -138,30 +140,10 @@ memory = ConversationBufferWindowMemory(
     output_key="output"
 )
 
-from langchain import LLMChain
-llm_chain = LLMChain(llm=llm, prompt=myTmplate)
+agent = create_json_chat_agent(llm=llm, tools=tools, prompt=myTmplate)
 
-from langchain.agents import Tool, AgentExecutor, LLMSingleActionAgent, AgentOutputParser
-tool_names = [tool.name for tool in tools]
-agent = LLMSingleActionAgent(
-    llm_chain=llm_chain,
-    output_parser=output_parser,
-    stop=["\nObservation:"],
-    allowed_tools=tool_names
-)
-agent_executor = AgentExecutor.from_agent_and_tools(
-    agent=agent_obj,
-    tools=tools,
-    callback_manager=None,
-    verbose=True,
-    memory=memory,
-    #return_intermediate_steps=True,
-    #handle_parsing_errors=True
-)
-# agent = create_json_chat_agent(llm=llm, tools=tools, prompt=myTmplate)
-#
-# agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, memory=memory,
-#                                return_intermediate_steps=True)
+agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, memory=memory,
+                               return_intermediate_steps=True)
 
 while True:
     if userInput == "exit":
