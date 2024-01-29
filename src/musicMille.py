@@ -5,7 +5,7 @@ from langchain import hub
 from langchain.memory import ConversationBufferWindowMemory
 
 from tools import listen_tool, generatemixtape_tool, followup_tool
-from langchain.agents import initialize_agent, AgentExecutor, load_tools
+from langchain.agents import initialize_agent, AgentExecutor, load_tools, AgentType, ConversationalAgent
 import yaml
 from langchain_openai import ChatOpenAI
 from langchain.agents import create_openai_functions_agent, create_structured_chat_agent, create_react_agent, \
@@ -26,6 +26,8 @@ if n > 1:
 else:
     userInput = "Make a mixtape " + input('''Make a mixtape ''')
 
+logger.info(userInput)
+
 # Construct the agent. We will use the default agent type here.
 tools = [listen_tool, generatemixtape_tool, followup_tool]
 
@@ -33,15 +35,15 @@ tools = [listen_tool, generatemixtape_tool, followup_tool]
 llm = ChatOpenAI(temperature=0)  # , model="gpt-4")
 
 impersonification = '''
-Your task is to chat with the Human in order to get mixtape details, create a mixtape and write it to spotify. 
+Your task is to chat with the User in order to get mixtape details, create a mixtape and write it to spotify. 
 Create a refined version of the mixtape after every user input and show the user the result. 
-Add some followup questions in order to get a more detailed description of the mixtape you have to create. Do it even if you already generated a mixtape.
+Laways ask some followup questions in order to get a more detailed description of the mixtape you have to create. Do it even if you already generated a mixtape.
 Write the mixtape to spotify only if the user confirms it. 
 '''
 # Explain the user why
 # Remember the Human that can ask for modification of the playlist and ask followup questions.
 # tools_prompt = """ You have access to the following tools:"""
-system_1 = """
+system = """
 You have access to the following tools:
 {tools}
 Use a json blob to specify a tool by providing an action key (tool name) and an action_input key (tool input).
@@ -87,17 +89,15 @@ You have access to the following tools:
 
 RESPONSE FORMAT INSTRUCTIONS
 ----------------------------
-When responding to me, please output a response in one of two formats:
+Output a response in one of two formats:
 **Option 1:**
-Use this if you want the human to use a tool.
-Markdown code snippet formatted in the following schema:
+Use this if you want to use a tool.
 ```json
 {{
     "action": string, \ The action to take. Must be one of {tool_names}
     "action_input": string \ The input to the action
 }}
 ```
-
 **Option #2:**
 Use this if you want to respond directly to the human. Markdown code snippet formatted in the following schema:
 ```json
@@ -115,26 +115,21 @@ Here is the user's input (remember to respond with a markdown code snippet of a 
 {input}
 """
 
-# prompt = hub.pull("hwchase17/structured-chat-agent")
-# print(prompt)
-# print(type(prompt))
-# agent = create_structured_chat_agent(llm=llm, tools=tools, prompt=prompt)
-
-
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 myTmplate = ChatPromptTemplate.from_messages([
     #
-    ("system", impersonification + system_2),
+    ("system", impersonification + system),
     MessagesPlaceholder("chat_history", optional=True),
-    ("human", human_template_2),
+    ("human", human_template),
     MessagesPlaceholder("agent_scratchpad")
 ])
 print(myTmplate)
 print(type(myTmplate))
-agent = create_json_chat_agent(llm=llm, tools=tools, prompt=myTmplate)
+# agent = create_structured_chat_agent(llm=llm, tools=tools, prompt=myTmplate)
 
-# Create the memory object
+chat_history = MessagesPlaceholder(variable_name="chat_history")
+
 memory = ConversationBufferWindowMemory(
     memory_key='chat_history',
     k=3,
@@ -143,8 +138,21 @@ memory = ConversationBufferWindowMemory(
     output_key="output"
 )
 
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, memory=memory,
-                               return_intermediate_steps=True)
+agent_obj = ConversationalAgent.from_llm_and_tools(
+    llm, tools, callback_manager=None, prompt=myTmplate
+)
+agent_executor = AgentExecutor.from_agent_and_tools(
+    agent=agent_obj,
+    tools=tools,
+    callback_manager=None,
+    verbose=True,
+    memory=memory,
+    return_intermediate_steps=True
+)
+# agent = create_json_chat_agent(llm=llm, tools=tools, prompt=myTmplate)
+#
+# agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, memory=memory,
+#                                return_intermediate_steps=True)
 
 while True:
     if userInput == "exit":
@@ -152,4 +160,5 @@ while True:
     else:
         logger.info("invoke the agent")
         response = agent_executor.invoke({"input": userInput})
+        # response= agent_chain.invoke({"input": userInput})
         userInput = input(response["output"])
