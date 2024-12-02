@@ -1,0 +1,43 @@
+name: Build and Deploy to GCR
+
+on:
+  push:
+    branches: [ main ]  # or your default branch
+  pull_request:
+    branches: [ main ]
+
+env:
+  PROJECT_ID: musicmille
+  IMAGE_NAME: run-core
+  REGISTRY: gcr.io
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ env.PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+
+    - name: Configure Docker for GCR
+      run: gcloud auth configure-docker
+
+    - name: Build Docker image
+      run: |
+        docker build \
+          --tag "$REGISTRY/$PROJECT_ID/$IMAGE_NAME:${{ github.sha }}" \
+          --tag "$REGISTRY/$PROJECT_ID/$IMAGE_NAME:latest" \
+          .
+
+    - name: Push Docker image to GCR
+      run: |
+        docker push "$REGISTRY/$PROJECT_ID/$IMAGE_NAME:${{ github.sha }}"
+        docker push "$REGISTRY/$PROJECT_ID/$IMAGE_NAME:latest"
