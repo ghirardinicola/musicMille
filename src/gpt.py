@@ -72,10 +72,16 @@ def build_templates():
 
 
 if __name__ == "__main__":
-    with open('config.yaml', 'r') as file:
-        config = yaml.safe_load(file)
+    import os
 
-    llm = ChatOpenAI(openai_api_key=config["open_api_api_key"], temperature=0)
+    SPOTIFY_CLIENT_ID = os.environ['SPOTIFY_CLIENT_ID']
+    SPOTIFY_CLIENT_SECRET = os.environ['SPOTIFY_CLIENT_SECRET']
+    SPOTIFY_USERNAME = os.environ['SPOTIFY_USERNAME']
+    OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
+    # with open('config.yaml', 'r') as file:
+    #     config = yaml.safe_load(file)
+
+    llm = ChatOpenAI(openai_api_key=OPENAI_API_KEY, temperature=0)
 
     user_prompt = 'rock adatta al sabato mattina come la farebbe scaruffi'
     main_prompt, follow_up = build_templates()
