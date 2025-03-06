@@ -5,7 +5,6 @@ on:
     branches: [ main ]
 
 env:
-env:
   PROJECT_ID: ${{ vars.PROJECT_ID }}
   IMAGE_NAME: ${{ vars.IMAGE_NAME }}
   REGISTRY: eu.gcr.io
