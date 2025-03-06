@@ -24,7 +24,17 @@ jobs:
         export_default_credentials: true
 
     - name: Authorize Docker push
-      run: gcloud auth configure-docker europe-docker.pkg.dev --quiet
+      run: |
+        # Configure Docker to use gcloud credentials with Artifact Registry
+        gcloud auth configure-docker europe-docker.pkg.dev --quiet
+        
+        # Add more detailed logging to debug the issue
+        echo "Verifying authentication configuration..."
+        gcloud auth list
+        
+        # Make the authentication call more explicit
+        echo "Authenticating with Artifact Registry..."
+        gcloud --quiet auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://europe-docker.pkg.dev
 
     - name: Build Docker image
       run: |
