@@ -5,9 +5,10 @@ on:
     branches: [ main ]
 
 env:
-  PROJECT_ID: your-project-id
-  IMAGE_NAME: your-app-name
-  REGISTRY: gcr.io
+env:
+  PROJECT_ID: ${{ vars.PROJECT_ID }}
+  IMAGE_NAME: ${{ vars.IMAGE_NAME }}
+  REGISTRY: eu.gcr.io
 
 jobs:
   build-and-deploy:
@@ -48,4 +49,3 @@ jobs:
     #     service: your-service-name
     #     image: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
     #     region: us-central1
-    
