@@ -16,25 +16,23 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    - name: Authenticate to Google Cloud
+    id: auth
+    uses: google-github-actions/auth@v1
+    with:
+      credentials_json: ${{ secrets.GCP_SA_KEY }}
+  
+    - name: Authenticate to Google Cloud
+    id: auth
+    uses: google-github-actions/auth@v1
+    with:
+      credentials_json: ${{ secrets.GCP_SA_KEY }}
+    
     - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
-      with:
-        project_id: ${{ env.PROJECT_ID }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        export_default_credentials: true
-
-    - name: Authorize Docker push
-      run: |
-        # Configure Docker to use gcloud credentials with Artifact Registry
-        gcloud auth configure-docker europe-docker.pkg.dev --quiet
-        
-        # Add more detailed logging to debug the issue
-        echo "Verifying authentication configuration..."
-        gcloud auth list
-        
-        # Make the authentication call more explicit
-        echo "Authenticating with Artifact Registry..."
-        gcloud --quiet auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://europe-docker.pkg.dev
+      uses: google-github-actions/setup-gcloud@v2
+    
+    - name: Configure Docker for Artifact Registry
+      run: gcloud auth configure-docker europe-docker.pkg.dev --quiet
 
     - name: Build Docker image
       run: |
