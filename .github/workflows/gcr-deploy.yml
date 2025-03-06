@@ -1,13 +1,14 @@
-name: Build and Deploy to GCR
+name: Build and Deploy to Artifact Registry
 
 on:
   push:
     branches: [ main ]
 
 env:
-  PROJECT_ID: ${{ vars.PROJECT_ID }}
-  IMAGE_NAME: ${{ vars.IMAGE_NAME }}
-  REGISTRY: eu.gcr.io
+  PROJECT_ID: musicmille
+  IMAGE_NAME: musicmille_backend
+  REGISTRY: europe-docker.pkg.dev
+  REPOSITORY: docker-repo
 
 jobs:
   build-and-deploy:
@@ -23,7 +24,7 @@ jobs:
         export_default_credentials: true
 
     - name: Authorize Docker push
-      run: gcloud auth configure-docker $REGISTRY
+      run: gcloud auth configure-docker europe-docker.pkg.dev --quiet
 
     - name: Build Docker image
       run: |
@@ -32,19 +33,11 @@ jobs:
           --build-arg SPOTIFY_CLIENT_SECRET=${{ secrets.SPOTIFY_CLIENT_SECRET }} \
           --build-arg SPOTIFY_USERNAME=${{ secrets.SPOTIFY_USERNAME }} \
           --build-arg OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
-          --tag "$REGISTRY/$PROJECT_ID/$IMAGE_NAME:${{ github.sha }}" \
-          --tag "$REGISTRY/$PROJECT_ID/$IMAGE_NAME:latest" \
+          --tag "$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:${{ github.sha }}" \
+          --tag "$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:latest" \
           .
 
     - name: Push Docker image
       run: |
-        docker push "$REGISTRY/$PROJECT_ID/$IMAGE_NAME:${{ github.sha }}"
-        docker push "$REGISTRY/$PROJECT_ID/$IMAGE_NAME:latest"
-    
-    # Add deployment steps here if needed, e.g., to GKE or Cloud Run
-    # - name: Deploy to Cloud Run
-    #   uses: google-github-actions/deploy-cloudrun@v1
-    #   with:
-    #     service: your-service-name
-    #     image: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-    #     region: us-central1
+        docker push "$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:${{ github.sha }}"
+        docker push "$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:latest"
