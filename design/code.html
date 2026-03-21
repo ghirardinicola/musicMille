@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sonic Alchemist - Curation Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-error": "#490013",
+              "on-tertiary-fixed-variant": "#740044",
+              "surface-variant": "#252530",
+              "outline-variant": "#484750",
+              "secondary-fixed-dim": "#48d4f3",
+              "surface-bright": "#2b2b38",
+              "error-container": "#a70138",
+              "on-primary-container": "#2b006e",
+              "inverse-primary": "#6e3bd7",
+              "surface": "#0d0d15",
+              "tertiary-fixed": "#ff8cbc",
+              "inverse-surface": "#fcf8ff",
+              "on-tertiary-fixed": "#37001d",
+              "on-background": "#efecf8",
+              "on-primary-fixed": "#000000",
+              "primary-container": "#ae8dff",
+              "error": "#ff6e84",
+              "surface-dim": "#0d0d15",
+              "primary-fixed-dim": "#a27cff",
+              "on-tertiary": "#4b002a",
+              "on-error-container": "#ffb2b9",
+              "on-surface": "#efecf8",
+              "surface-container-high": "#1f1f29",
+              "on-secondary": "#004b58",
+              "secondary-fixed": "#65e1ff",
+              "secondary-container": "#00687a",
+              "on-surface-variant": "#acaab5",
+              "tertiary-dim": "#ff67ad",
+              "background": "#0d0d15",
+              "surface-container": "#191922",
+              "surface-tint": "#ba9eff",
+              "secondary-dim": "#40ceed",
+              "primary-fixed": "#ae8dff",
+              "on-secondary-fixed": "#003a45",
+              "on-secondary-fixed-variant": "#005969",
+              "surface-container-highest": "#252530",
+              "primary": "#ba9eff",
+              "tertiary-fixed-dim": "#ff73b1",
+              "on-primary-fixed-variant": "#370086",
+              "on-primary": "#39008c",
+              "primary-dim": "#8455ef",
+              "surface-container-low": "#13131b",
+              "tertiary-container": "#fa53a4",
+              "surface-container-lowest": "#000000",
+              "on-secondary-container": "#ecfaff",
+              "inverse-on-surface": "#55545e",
+              "error-dim": "#d73357",
+              "tertiary": "#ff6daf",
+              "on-tertiary-container": "#2f0018",
+              "secondary": "#53ddfc",
+              "outline": "#76747f"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(25, 25, 34, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#0d0d15]/80 backdrop-blur-xl shadow-[0_0_32px_rgba(239,236,248,0.04)] border-none">
+<div class="flex items-center justify-between px-6 py-4 w-full">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center border border-outline-variant/20 overflow-hidden">
+<img alt="AI Assistant" class="w-full h-full object-cover" data-alt="Futuristic AI avatar with glowing purple accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADZ1O62MHQBxCoq3gilaa6-tQCKnPvNIcn3fZ-ZrenlU-4dyfdgzDmXfX1LAhzSbGP9JDOx03jmijzT93_TD5jQYYHcfGZIl8TVgddE5ngfQ-Iw9dmbLhllNhkpnEDBHqO_Yf0uMwsY7wV9uf-XgtJIml7NcUawVQyAekXf_lMVER_GNF2tJ6fOapaXT_EpfgP9Odx0FDlc3mBDbXByWeqXm6aMnh39NNkHDKAg9rHiu9i3mKiGBQ2LFrgnYEw7D-Ho4cowfpwfFvh"/>
+</div>
+<h1 class="font-['Plus_Jakarta_Sans'] font-bold tracking-tight text-xl font-extrabold bg-gradient-to-br from-[#ba9eff] to-[#8455ef] bg-clip-text text-transparent">Sonic Alchemist</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#efecf8]/10 transition-colors active:scale-95 duration-200 text-[#ba9eff]">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 min-h-screen flex flex-col max-w-2xl mx-auto">
+<!-- Header Section -->
+<section class="mb-8">
+<h2 class="font-headline text-display-lg text-4xl font-extrabold tracking-tight mb-2">Select your Gems</h2>
+<div class="flex items-center justify-between gap-4">
+<div class="flex-1 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-secondary w-2/3 rounded-full"></div>
+</div>
+<span class="font-label text-xs font-semibold uppercase tracking-widest text-secondary">8 / 12 Tracks</span>
+</div>
+</section>
+<!-- Main Curation Card (Asymmetric Layout) -->
+<section class="flex-1 flex flex-col relative">
+<div class="relative w-full aspect-[4/5] rounded-lg overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] group">
+<!-- Album Art Image -->
+<img alt="Album Cover" class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105" data-alt="Abstract colorful neon waves representing music frequencies" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyrUJANsWtkS3HrMLPRtw08grgd2sz4IgknkWeAa2oXzC4T5Vs4I0IsoqPdBmcFKvG5kREfLDJKTbd9yeHMzkalkDO4POP73q2KCAkBIi3rqVJYHxbhvQ_ipAR-Paeeao9jkh6e2AKpcPiUcjkriLCmJ8_A8b2eAnauj0OAhP_GBsF4CXezN0PzvY4F6G3FS3zhYFf-YM4TTN__grckF7KOnfxF59IJJ_ynPwQj3mHH-3LcmnQCCPUgNZ27puTu22OuPXHk5VZBkAo"/>
+<!-- Vibe Overlay (Glassmorphism) -->
+<div class="absolute bottom-0 left-0 right-0 p-8 pt-12 bg-gradient-to-t from-surface via-surface/80 to-transparent">
+<div class="flex items-center gap-2 mb-4">
+<span class="px-3 py-1 bg-tertiary/20 text-tertiary-fixed text-[10px] font-bold uppercase tracking-widest rounded-full border border-tertiary/30">AI Insight</span>
+<p class="text-sm font-medium text-secondary-fixed-dim italic">"A melancholic drift through synthetic neon clouds."</p>
+</div>
+<h3 class="font-headline text-3xl font-bold mb-1">Midnight Protocol</h3>
+<p class="font-body text-lg text-on-surface-variant mb-6">Velvet Echo • <span class="text-on-surface/60">Digital Soul</span></p>
+<!-- Control Buttons Container -->
+<div class="flex items-center gap-4">
+<!-- Skip Button -->
+<button class="flex-1 h-14 rounded-full bg-surface-container-highest/60 backdrop-blur-md flex items-center justify-center gap-2 hover:bg-surface-container-highest transition-all active:scale-95 text-on-surface-variant font-bold border border-outline-variant/10">
+<span class="material-symbols-outlined">close</span>
+                            Skip
+                        </button>
+<!-- Add to Mixtape Button -->
+<button class="flex-[1.5] h-14 rounded-full bg-gradient-to-br from-primary to-primary-dim flex items-center justify-center gap-2 shadow-[0_8px_24px_rgba(186,158,255,0.3)] hover:shadow-[0_12px_32px_rgba(186,158,255,0.5)] transition-all active:scale-95 text-on-primary-fixed font-bold">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+                            Add to Mixtape
+                        </button>
+</div>
+</div>
+<!-- AI Remix Secondary Action -->
+<button class="absolute top-6 right-6 w-12 h-12 rounded-full glass-panel flex items-center justify-center text-secondary border border-secondary/20 hover:bg-secondary/10 transition-colors group/remix">
+<span class="material-symbols-outlined group-hover/remix:rotate-45 transition-transform duration-300">auto_fix_high</span>
+</button>
+</div>
+<!-- Asymmetrical Decorative Element (Ghost Layer) -->
+<div class="absolute -z-10 -bottom-4 -right-4 w-full h-full border border-outline-variant/10 rounded-lg translate-x-2 translate-y-2 opacity-30"></div>
+</section>
+<!-- Prompt Suggestions (Bento Style) -->
+<section class="mt-10 grid grid-cols-2 gap-4">
+<div class="col-span-2 p-4 rounded-xl bg-surface-container border border-outline-variant/10 flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">psychology</span>
+</div>
+<div>
+<p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Refine Discovery</p>
+<p class="text-sm font-medium">"Make it more energetic and synth-heavy"</p>
+</div>
+</div>
+<button class="p-4 rounded-xl bg-surface-container-low border border-outline-variant/5 text-left hover:bg-surface-container transition-colors group">
+<span class="material-symbols-outlined text-primary mb-2 block group-hover:scale-110 transition-transform">vibration</span>
+<span class="text-xs font-semibold block">Same tempo</span>
+</button>
+<button class="p-4 rounded-xl bg-surface-container-low border border-outline-variant/5 text-left hover:bg-surface-container transition-colors group">
+<span class="material-symbols-outlined text-tertiary mb-2 block group-hover:scale-110 transition-transform">spatial_audio</span>
+<span class="text-xs font-semibold block">More vocals</span>
+</button>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full rounded-t-[2rem] z-50 bg-[#13131b]/70 backdrop-blur-2xl shadow-[0_-8px_32px_rgba(0,0,0,0.5)] border-t border-[#484750]/15">
+<div class="flex justify-around items-center px-8 pb-6 pt-3 w-full">
+<a class="flex flex-col items-center justify-center text-[#efecf8]/40 hover:text-[#ba9eff] transition-all active:scale-90 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined mb-1">auto_awesome</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold tracking-wide uppercase">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#ba9eff] bg-[#ba9eff]/10 rounded-full px-4 py-1 active:scale-90 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined mb-1">library_music</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold tracking-wide uppercase">Library</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#efecf8]/40 hover:text-[#ba9eff] transition-all active:scale-90 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold tracking-wide uppercase">Profile</span>
+</a>
+</div>
+</nav>
+<!-- Floating Background Nebula -->
+<div class="fixed top-0 left-0 w-full h-full -z-50 pointer-events-none opacity-40">
+<div class="absolute top-1/4 -left-20 w-96 h-96 bg-primary/20 blur-[120px] rounded-full"></div>
+<div class="absolute bottom-1/4 -right-20 w-80 h-80 bg-secondary/15 blur-[100px] rounded-full"></div>
+</div>
+</body></html>
