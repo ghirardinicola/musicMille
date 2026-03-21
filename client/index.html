@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sonic Alchemist</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "surface-variant": "#252530",
+          "outline-variant": "#484750",
+          "secondary-fixed-dim": "#48d4f3",
+          "surface-bright": "#2b2b38",
+          "on-primary-container": "#2b006e",
+          "inverse-primary": "#6e3bd7",
+          "surface": "#0d0d15",
+          "tertiary-fixed": "#ff8cbc",
+          "on-background": "#efecf8",
+          "primary-container": "#ae8dff",
+          "surface-dim": "#0d0d15",
+          "primary-fixed-dim": "#a27cff",
+          "on-tertiary": "#4b002a",
+          "on-surface": "#efecf8",
+          "surface-container-high": "#1f1f29",
+          "on-secondary": "#004b58",
+          "secondary-fixed": "#65e1ff",
+          "secondary-container": "#00687a",
+          "on-surface-variant": "#acaab5",
+          "tertiary-dim": "#ff67ad",
+          "background": "#0d0d15",
+          "surface-container": "#191922",
+          "surface-tint": "#ba9eff",
+          "secondary-dim": "#40ceed",
+          "primary-fixed": "#ae8dff",
+          "on-secondary-fixed": "#003a45",
+          "surface-container-highest": "#252530",
+          "primary": "#ba9eff",
+          "tertiary-fixed-dim": "#ff73b1",
+          "on-primary-fixed-variant": "#370086",
+          "on-primary": "#39008c",
+          "primary-dim": "#8455ef",
+          "surface-container-low": "#13131b",
+          "tertiary-container": "#fa53a4",
+          "surface-container-lowest": "#000000",
+          "on-secondary-container": "#ecfaff",
+          "inverse-on-surface": "#55545e",
+          "tertiary": "#ff6daf",
+          "on-tertiary-container": "#2f0018",
+          "secondary": "#53ddfc",
+          "outline": "#76747f"
+        },
+        fontFamily: {
+          "headline": ["Plus Jakarta Sans"],
+          "body": ["Inter"],
+          "label": ["Inter"]
+        },
+        borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+      },
+    },
+  }
+</script>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .fill-icon {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .glass-panel {
+    background: rgba(25, 25, 34, 0.6);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+  body { min-height: 100dvh; }
+  .screen { display: none; }
+  .screen.active { display: flex; }
+
+  /* chat message animation */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .msg-anim { animation: fadeUp 0.3s ease-out; }
+
+  /* typing dots */
+  @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+  .dot { animation: blink 1.4s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+</style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30 overflow-x-hidden">
+
+<!-- ═══════════════════ TOP APP BAR ═══════════════════ -->
+<header class="fixed top-0 w-full z-50 bg-[#0d0d15]/80 backdrop-blur-xl shadow-[0_0_32px_rgba(239,236,248,0.04)]">
+  <div class="flex items-center justify-between px-6 py-4 max-w-2xl mx-auto">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center border border-outline-variant/20 overflow-hidden">
+        <!-- Avatar placeholder with gradient -->
+        <div class="w-full h-full bg-gradient-to-br from-primary/60 to-primary-dim flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-primary text-lg">music_note</span>
+        </div>
+      </div>
+      <h1 class="font-['Plus_Jakarta_Sans'] font-extrabold text-xl bg-gradient-to-br from-[#ba9eff] to-[#8455ef] bg-clip-text text-transparent">
+        Sonic Alchemist
+      </h1>
+    </div>
+    <button onclick="showSettings()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#efecf8]/10 transition-colors active:scale-95 duration-200 text-[#ba9eff]">
+      <span class="material-symbols-outlined">settings</span>
+    </button>
+  </div>
+</header>
+
+<!-- ═══════════════════ SCREEN: HOME (Chat) ═══════════════════ -->
+<main id="screen-home" class="screen active pt-24 pb-32 min-h-screen flex-col max-w-2xl mx-auto px-4">
+
+  <!-- Welcome hero -->
+  <section class="mb-6 px-2 text-center">
+    <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/30 to-primary-dim/30 flex items-center justify-center border border-primary/20">
+      <span class="material-symbols-outlined text-4xl text-primary">auto_awesome</span>
+    </div>
+    <h2 class="font-headline text-3xl font-extrabold tracking-tight mb-2">What's the vibe?</h2>
+    <p class="text-on-surface-variant text-sm">Describe your mixtape and I'll craft it for you.</p>
+  </section>
+
+  <!-- Suggestion chips -->
+  <section class="mb-6 px-2">
+    <div class="flex flex-wrap gap-2 justify-center">
+      <button onclick="useSuggestion(this)" class="suggestion-chip px-4 py-2 rounded-full bg-surface-container border border-outline-variant/20 text-sm text-on-surface-variant hover:border-primary/40 hover:text-primary transition-all active:scale-95">
+        🌙 Late night drive
+      </button>
+      <button onclick="useSuggestion(this)" class="suggestion-chip px-4 py-2 rounded-full bg-surface-container border border-outline-variant/20 text-sm text-on-surface-variant hover:border-primary/40 hover:text-primary transition-all active:scale-95">
+        ⚡ Workout energy
+      </button>
+      <button onclick="useSuggestion(this)" class="suggestion-chip px-4 py-2 rounded-full bg-surface-container border border-outline-variant/20 text-sm text-on-surface-variant hover:border-primary/40 hover:text-primary transition-all active:scale-95">
+        ☕ Focus session
+      </button>
+      <button onclick="useSuggestion(this)" class="suggestion-chip px-4 py-2 rounded-full bg-surface-container border border-outline-variant/20 text-sm text-on-surface-variant hover:border-primary/40 hover:text-primary transition-all active:scale-95">
+        🌊 Chill Sunday
+      </button>
+    </div>
+  </section>
+
+  <!-- Chat messages -->
+  <section id="chat-messages" class="flex-1 flex flex-col gap-3 px-2 mb-4 min-h-[160px]">
+    <!-- messages injected by JS -->
+  </section>
+
+  <!-- Chat input -->
+  <div class="sticky bottom-28 px-2">
+    <div class="flex items-end gap-3 p-3 rounded-2xl bg-surface-container border border-outline-variant/20 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+      <textarea
+        id="chat-input"
+        rows="1"
+        placeholder="Describe your mixtape..."
+        onInput="autoResize(this)"
+        onkeydown="handleKey(event)"
+        class="flex-1 bg-transparent resize-none outline-none text-sm text-on-surface placeholder-on-surface-variant/50 max-h-32 leading-relaxed py-1"
+      ></textarea>
+      <button onclick="sendMessage()" class="w-10 h-10 flex-shrink-0 rounded-full bg-gradient-to-br from-primary to-primary-dim flex items-center justify-center shadow-[0_4px_16px_rgba(186,158,255,0.3)] hover:shadow-[0_6px_24px_rgba(186,158,255,0.5)] transition-all active:scale-90">
+        <span class="material-symbols-outlined text-on-primary text-[20px]">send</span>
+      </button>
+    </div>
+  </div>
+</main>
+
+<!-- ═══════════════════ SCREEN: LIBRARY (Curation) ═══════════════════ -->
+<main id="screen-library" class="screen pt-24 pb-32 flex-col max-w-2xl mx-auto px-6">
+
+  <!-- Header -->
+  <section class="mb-8">
+    <h2 class="font-headline text-4xl font-extrabold tracking-tight mb-2">Select your Gems</h2>
+    <div class="flex items-center justify-between gap-4">
+      <div class="flex-1 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+        <div id="progress-bar" class="h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-500" style="width: 66%"></div>
+      </div>
+      <span id="track-count" class="font-label text-xs font-semibold uppercase tracking-widest text-secondary">8 / 12 Tracks</span>
+    </div>
+  </section>
+
+  <!-- Curation Card -->
+  <section class="flex-1 flex flex-col relative">
+    <div class="relative w-full aspect-[4/5] rounded-lg overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] group">
+
+      <!-- Album Art (gradient placeholder) -->
+      <div class="w-full h-full bg-gradient-to-br from-[#1a0a2e] via-[#0d1a2e] to-[#0a2018] flex items-center justify-center">
+        <div class="w-40 h-40 rounded-full bg-gradient-to-br from-primary/30 via-secondary/20 to-tertiary/20 blur-3xl"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-32 h-32 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-6xl text-primary/60">music_note</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Glassmorphism overlay -->
+      <div class="absolute bottom-0 left-0 right-0 p-8 pt-12 bg-gradient-to-t from-surface via-surface/80 to-transparent">
+        <!-- AI Insight chip -->
+        <div class="flex items-center gap-2 mb-4">
+          <span class="px-3 py-1 bg-tertiary/20 text-tertiary-fixed text-[10px] font-bold uppercase tracking-widest rounded-full border border-tertiary/30">AI Insight</span>
+          <p class="text-sm font-medium text-secondary-fixed-dim italic">"A melancholic drift through synthetic neon clouds."</p>
+        </div>
+
+        <!-- Track info -->
+        <h3 class="font-headline text-3xl font-bold mb-1">Midnight Protocol</h3>
+        <p class="font-body text-lg text-on-surface-variant mb-6">
+          Velvet Echo • <span class="text-on-surface/60">Digital Soul</span>
+        </p>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-4">
+          <button onclick="skipTrack()" class="flex-1 h-14 rounded-full bg-surface-container-highest/60 backdrop-blur-md flex items-center justify-center gap-2 hover:bg-surface-container-highest transition-all active:scale-95 text-on-surface-variant font-bold border border-outline-variant/10">
+            <span class="material-symbols-outlined">close</span>
+            Skip
+          </button>
+          <button onclick="addToMixtape()" class="flex-[1.5] h-14 rounded-full bg-gradient-to-br from-primary to-primary-dim flex items-center justify-center gap-2 shadow-[0_8px_24px_rgba(186,158,255,0.3)] hover:shadow-[0_12px_32px_rgba(186,158,255,0.5)] transition-all active:scale-95 text-on-primary-fixed font-bold">
+            <span class="material-symbols-outlined fill-icon">star</span>
+            Add to Mixtape
+          </button>
+        </div>
+      </div>
+
+      <!-- AI Remix button -->
+      <button class="absolute top-6 right-6 w-12 h-12 rounded-full glass-panel flex items-center justify-center text-secondary border border-secondary/20 hover:bg-secondary/10 transition-colors group/remix">
+        <span class="material-symbols-outlined group-hover/remix:rotate-45 transition-transform duration-300">auto_fix_high</span>
+      </button>
+    </div>
+
+    <!-- Ghost layer decoration -->
+    <div class="absolute -z-10 -bottom-4 -right-4 w-full h-full border border-outline-variant/10 rounded-lg translate-x-2 translate-y-2 opacity-30"></div>
+  </section>
+
+  <!-- Refine + Quick chips -->
+  <section class="mt-10 grid grid-cols-2 gap-4">
+    <div class="col-span-2 p-4 rounded-xl bg-surface-container border border-outline-variant/10 flex items-center gap-4">
+      <div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary flex-shrink-0">
+        <span class="material-symbols-outlined">psychology</span>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Refine Discovery</p>
+        <p class="text-sm font-medium">"Make it more energetic and synth-heavy"</p>
+      </div>
+    </div>
+    <button class="p-4 rounded-xl bg-surface-container-low border border-outline-variant/5 text-left hover:bg-surface-container transition-colors group">
+      <span class="material-symbols-outlined text-primary mb-2 block group-hover:scale-110 transition-transform">vibration</span>
+      <span class="text-xs font-semibold block">Same tempo</span>
+    </button>
+    <button class="p-4 rounded-xl bg-surface-container-low border border-outline-variant/5 text-left hover:bg-surface-container transition-colors group">
+      <span class="material-symbols-outlined text-tertiary mb-2 block group-hover:scale-110 transition-transform">spatial_audio</span>
+      <span class="text-xs font-semibold block">More vocals</span>
+    </button>
+  </section>
+</main>
+
+<!-- ═══════════════════ SCREEN: PROFILE ═══════════════════ -->
+<main id="screen-profile" class="screen pt-24 pb-32 flex-col max-w-2xl mx-auto px-6">
+
+  <!-- Profile hero -->
+  <section class="flex flex-col items-center mb-8 pt-4">
+    <div class="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-primary-dim flex items-center justify-center mb-4 shadow-[0_8px_32px_rgba(186,158,255,0.3)]">
+      <span class="material-symbols-outlined text-5xl text-on-primary">person</span>
+    </div>
+    <h2 class="font-headline text-2xl font-bold mb-1">Music Lover</h2>
+    <p class="text-on-surface-variant text-sm">Spotify Connected</p>
+  </section>
+
+  <!-- Stats row -->
+  <section class="grid grid-cols-3 gap-3 mb-8">
+    <div class="p-4 rounded-xl bg-surface-container text-center border border-outline-variant/10">
+      <p class="font-headline text-2xl font-bold text-primary">24</p>
+      <p class="text-xs text-on-surface-variant mt-1">Mixtapes</p>
+    </div>
+    <div class="p-4 rounded-xl bg-surface-container text-center border border-outline-variant/10">
+      <p class="font-headline text-2xl font-bold text-secondary">312</p>
+      <p class="text-xs text-on-surface-variant mt-1">Tracks</p>
+    </div>
+    <div class="p-4 rounded-xl bg-surface-container text-center border border-outline-variant/10">
+      <p class="font-headline text-2xl font-bold text-tertiary">7</p>
+      <p class="text-xs text-on-surface-variant mt-1">Shared</p>
+    </div>
+  </section>
+
+  <!-- Recent mixtapes -->
+  <section>
+    <h3 class="font-headline text-lg font-bold mb-4">Recent Mixtapes</h3>
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center gap-4 p-4 rounded-xl bg-surface-container border border-outline-variant/10 hover:bg-surface-container-high transition-colors">
+        <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/40 to-primary-dim/40 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-primary">music_note</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-semibold text-sm truncate">Late Night Drive</p>
+          <p class="text-xs text-on-surface-variant">12 tracks · 47 min</p>
+        </div>
+        <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-primary/10 text-primary transition-colors">
+          <span class="material-symbols-outlined text-[20px]">play_circle</span>
+        </button>
+      </div>
+      <div class="flex items-center gap-4 p-4 rounded-xl bg-surface-container border border-outline-variant/10 hover:bg-surface-container-high transition-colors">
+        <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-secondary/40 to-secondary-dim/40 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-secondary">music_note</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-semibold text-sm truncate">Focus Mode</p>
+          <p class="text-xs text-on-surface-variant">8 tracks · 32 min</p>
+        </div>
+        <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-secondary/10 text-secondary transition-colors">
+          <span class="material-symbols-outlined text-[20px]">play_circle</span>
+        </button>
+      </div>
+      <div class="flex items-center gap-4 p-4 rounded-xl bg-surface-container border border-outline-variant/10 hover:bg-surface-container-high transition-colors">
+        <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-tertiary/40 to-tertiary-dim/40 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-tertiary">music_note</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-semibold text-sm truncate">Sunday Vibes</p>
+          <p class="text-xs text-on-surface-variant">15 tracks · 58 min</p>
+        </div>
+        <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-tertiary/10 text-tertiary transition-colors">
+          <span class="material-symbols-outlined text-[20px]">play_circle</span>
+        </button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ═══════════════════ BOTTOM NAV ═══════════════════ -->
+<nav class="fixed bottom-0 w-full rounded-t-[2rem] z-50 bg-[#13131b]/70 backdrop-blur-2xl shadow-[0_-8px_32px_rgba(0,0,0,0.5)] border-t border-[#484750]/15">
+  <div class="flex justify-around items-center px-8 pb-6 pt-3 max-w-2xl mx-auto">
+    <button onclick="switchTab('home')" id="tab-home" class="nav-tab flex flex-col items-center justify-center text-[#efecf8]/40 hover:text-[#ba9eff] transition-all active:scale-90 duration-300 ease-out px-4 py-1">
+      <span class="material-symbols-outlined mb-1">auto_awesome</span>
+      <span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold tracking-wide uppercase">Home</span>
+    </button>
+    <button onclick="switchTab('library')" id="tab-library" class="nav-tab flex flex-col items-center justify-center text-[#efecf8]/40 hover:text-[#ba9eff] transition-all active:scale-90 duration-300 ease-out px-4 py-1">
+      <span class="material-symbols-outlined mb-1">library_music</span>
+      <span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold tracking-wide uppercase">Library</span>
+    </button>
+    <button onclick="switchTab('profile')" id="tab-profile" class="nav-tab flex flex-col items-center justify-center text-[#efecf8]/40 hover:text-[#ba9eff] transition-all active:scale-90 duration-300 ease-out px-4 py-1">
+      <span class="material-symbols-outlined mb-1">person</span>
+      <span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold tracking-wide uppercase">Profile</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══════════════════ SETTINGS SHEET ═══════════════════ -->
+<div id="settings-overlay" onclick="hideSettings()" class="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm hidden"></div>
+<div id="settings-sheet" class="fixed bottom-0 left-0 right-0 z-[70] bg-surface-container rounded-t-[2rem] p-6 translate-y-full transition-transform duration-300 max-w-2xl mx-auto">
+  <div class="w-10 h-1 bg-outline-variant rounded-full mx-auto mb-6"></div>
+  <h3 class="font-headline text-xl font-bold mb-6">Settings</h3>
+  <div class="flex flex-col gap-4">
+    <div class="flex items-center justify-between p-4 rounded-xl bg-surface-container-high">
+      <div>
+        <p class="font-semibold text-sm">Spotify Account</p>
+        <p class="text-xs text-on-surface-variant mt-0.5">Not connected</p>
+      </div>
+      <button class="px-4 py-2 rounded-full bg-gradient-to-br from-primary to-primary-dim text-on-primary text-xs font-bold active:scale-95 transition-all">
+        Connect
+      </button>
+    </div>
+    <div class="flex items-center justify-between p-4 rounded-xl bg-surface-container-high">
+      <div>
+        <p class="font-semibold text-sm">AI Model</p>
+        <p class="text-xs text-on-surface-variant mt-0.5">gpt-4o</p>
+      </div>
+      <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+    </div>
+    <div class="flex items-center justify-between p-4 rounded-xl bg-surface-container-high">
+      <div>
+        <p class="font-semibold text-sm">Mixtape Length</p>
+        <p class="text-xs text-on-surface-variant mt-0.5">12 tracks</p>
+      </div>
+      <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ BACKGROUND NEBULA ═══════════════════ -->
+<div class="fixed top-0 left-0 w-full h-full -z-50 pointer-events-none opacity-40">
+  <div class="absolute top-1/4 -left-20 w-96 h-96 bg-primary/20 blur-[120px] rounded-full"></div>
+  <div class="absolute bottom-1/4 -right-20 w-80 h-80 bg-secondary/15 blur-[100px] rounded-full"></div>
+</div>
+
+<!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
+<script>
+  // ─── Nav ─────────────────────────────────────────────
+  const tabs = ['home', 'library', 'profile'];
+  let currentTab = 'home';
+
+  function switchTab(tab) {
+    // hide all screens
+    tabs.forEach(t => {
+      document.getElementById('screen-' + t).classList.remove('active');
+      const btn = document.getElementById('tab-' + t);
+      btn.classList.remove('text-[#ba9eff]', 'bg-[#ba9eff]/10', 'rounded-full');
+      btn.classList.add('text-[#efecf8]/40');
+    });
+    // show selected
+    document.getElementById('screen-' + tab).classList.add('active');
+    const activeBtn = document.getElementById('tab-' + tab);
+    activeBtn.classList.remove('text-[#efecf8]/40');
+    activeBtn.classList.add('text-[#ba9eff]', 'bg-[#ba9eff]/10', 'rounded-full');
+    currentTab = tab;
+  }
+
+  // init: activate home tab
+  switchTab('home');
+
+  // ─── Settings sheet ──────────────────────────────────
+  function showSettings() {
+    document.getElementById('settings-overlay').classList.remove('hidden');
+    setTimeout(() => {
+      document.getElementById('settings-sheet').classList.remove('translate-y-full');
+    }, 10);
+  }
+  function hideSettings() {
+    document.getElementById('settings-sheet').classList.add('translate-y-full');
+    setTimeout(() => {
+      document.getElementById('settings-overlay').classList.add('hidden');
+    }, 300);
+  }
+
+  // ─── Chat ─────────────────────────────────────────────
+  const API_URL = 'http://localhost:8080/v1/chat/completions';
+  let messages = [
+    { role: 'system', content: 'You are MusicMille, an expert music lover with excellent empathic skills. Your task is to chat with the User to get mixtape details, then propose a tracklist. Always ask at least one creative follow-up question.' }
+  ];
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 128) + 'px';
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function useSuggestion(btn) {
+    const input = document.getElementById('chat-input');
+    input.value = btn.textContent.trim().replace(/^[^\s]+\s/, '');
+    autoResize(input);
+    input.focus();
+  }
+
+  function appendMessage(role, text) {
+    const container = document.getElementById('chat-messages');
+    const isUser = role === 'user';
+    const div = document.createElement('div');
+    div.className = 'msg-anim flex ' + (isUser ? 'justify-end' : 'justify-start');
+    div.innerHTML = `
+      <div class="max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+        isUser
+          ? 'bg-gradient-to-br from-primary to-primary-dim text-on-primary rounded-br-sm'
+          : 'bg-surface-container border border-outline-variant/10 text-on-surface rounded-bl-sm'
+      }">
+        ${text}
+      </div>`;
+    container.appendChild(div);
+    container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }
+
+  function showTyping() {
+    const container = document.getElementById('chat-messages');
+    const div = document.createElement('div');
+    div.id = 'typing-indicator';
+    div.className = 'msg-anim flex justify-start';
+    div.innerHTML = `
+      <div class="px-4 py-3 rounded-2xl bg-surface-container border border-outline-variant/10 rounded-bl-sm">
+        <div class="flex gap-1 items-center h-4">
+          <span class="dot w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span>
+          <span class="dot w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span>
+          <span class="dot w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span>
+        </div>
+      </div>`;
+    container.appendChild(div);
+    container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }
+
+  function hideTyping() {
+    const el = document.getElementById('typing-indicator');
+    if (el) el.remove();
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    input.value = '';
+    autoResize(input);
+    appendMessage('user', text);
+    messages.push({ role: 'user', content: text });
+
+    showTyping();
+
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'musicmille', messages, temperature: 0.8 })
+      });
+      const data = await res.json();
+      hideTyping();
+      const reply = data?.choices?.[0]?.message?.content ?? 'Something went wrong.';
+      messages.push({ role: 'assistant', content: reply });
+      appendMessage('assistant', reply);
+    } catch (err) {
+      hideTyping();
+      appendMessage('assistant', 'Could not reach the server. Make sure the backend is running on port 8080.');
+    }
+  }
+
+  // ─── Library interactions ────────────────────────────
+  let tracksAdded = 8;
+  const totalTracks = 12;
+
+  function updateProgress() {
+    const pct = (tracksAdded / totalTracks) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('track-count').textContent = tracksAdded + ' / ' + totalTracks + ' Tracks';
+  }
+
+  function addToMixtape() {
+    if (tracksAdded < totalTracks) {
+      tracksAdded++;
+      updateProgress();
+    }
+    // animate button feedback
+    const btn = event.currentTarget;
+    btn.classList.add('scale-95');
+    setTimeout(() => btn.classList.remove('scale-95'), 150);
+  }
+
+  function skipTrack() {
+    // visual feedback only for now
+    const card = document.querySelector('#screen-library .aspect-\\[4\\/5\\]');
+    card.classList.add('opacity-0', '-translate-x-8', 'transition-all', 'duration-300');
+    setTimeout(() => {
+      card.classList.remove('opacity-0', '-translate-x-8');
+    }, 400);
+  }
+</script>
+</body>
+</html>
